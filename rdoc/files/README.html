@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: README</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>README</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>README
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Thu Jun 19 13:25:02 +0100 2008</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h2>Author</h2>
+<pre>
+  Matthew Rudy Jacobs
+</pre>
+<h2>Contact</h2>
+<pre>
+  MatthewRudyJacobs@gmail.com
+</pre>
+<p>
+<a href="../classes/RudeQ.html">RudeQ</a>
+</p>
+<h6>=======</h6>
+<pre>
+  A simple DB based queue,
+  designed for situations where a server based queue is unnecessary.
+</pre>
+<p>
+INSTALL
+</p>
+<h6>======</h6>
+<p>
+This plugin requires Rails 2.* currently, and has only been tested on
+MySQL. It definitely does not work on SQLite (as it requires :limit and
+:order options for a SQL UPDATE command)
+</p>
+<p>
+Install easily by below command:
+</p>
+<pre>
+  ruby script/plugin install git://github.com/matthewrudy/rudeq.git
+</pre>
+<p>
+USAGE
+</p>
+<h6>======</h6>
+<p>
+After you&#8216;ve installed it just run
+</p>
+<pre>
+  rake queue:setup
+
+  matthew@iRudy:~/code/jbequeueing $ rake queue:setup
+  (in /Users/matthew/code/jbequeueing)
+      exists  app/models/
+      exists  spec/fixtures/
+      exists  spec/models/
+      create  app/models/rude_queue.rb
+      create  spec/fixtures/rude_queues.yml
+      create  spec/models/rude_queue_spec.rb
+      exists  db/migrate
+      create  db/migrate/029_create_rude_queues.rb
+
+  and you're done.
+  Fully tested, fully index... BOOM!
+
+  Now run migrations, start up a console, and;
+
+      RudeQueue.set(:queue_name, RandomObject)
+      RudeQueue.get(:queue_name)
+
+  And, to keep the queue running fast,
+  set up a cron job to run
+
+      rake queue:cleanup
+
+  the cleanup will remove any queued items which have been processed longer than an hour ago.
+
+      rake queue:cleanup CLEANUP_TIME=86,400
+
+  will clear processed queue items processed longer than 86,400 seconds ago (1 day)
+</pre>
+<p>
+Try Yourself!
+</p>
+<p>
+Copyright (c) 2008 [Matthew Rudy Jacobs Email:
+MatthewRudyJacobs@gmail.com], released under the MIT license
+</p>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
