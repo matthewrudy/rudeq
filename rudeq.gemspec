@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name = "RudeQ"
+  s.name = "rudeq"
   s.version = "0.1"
   s.date = "2008-06-21"
   s.summary = "ActiveRecord-based DB-queue"
