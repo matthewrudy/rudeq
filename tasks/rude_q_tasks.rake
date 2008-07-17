@@ -8,8 +8,9 @@ namespace :queue do
 
   desc "Removes all the old queue items"
   task :cleanup => :environment do
+    queue_model = (ENV["QUEUE"] || "RudeQueue").constantize
     args = [ENV["CLEANUP_TIME"]].compact
-    RudeQueue.cleanup!(*args) # no arg if no CLEANUP_TIME specified
+    queue_model.cleanup!(*args) # no arg if no CLEANUP_TIME specified
   end
 end
 
