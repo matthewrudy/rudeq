@@ -94,6 +94,26 @@ describe ProcessQueue do
       ProcessQueue.get('abcde').should == :new_data
       ProcessQueue.get('abcde').should be(nil)
     end
+    
+    it "should revert any token setting / processing if something goes wrong before it retrieves the data" do
+      ProcessQueue.should_receive(:processed!).and_raise(RuntimeError)
+      ProcessQueue.set('abcde', :this_will_stay_unprocessed)
+      
+      # confirm the object is in the db
+      record = ProcessQueue.find(:first, :order => "id DESC")
+      record.queue_name.should == 'abcde'
+      record.data.should == :this_will_stay_unprocessed
+      record.processed?.should == false
+      record.token.should == nil
+      
+      lambda {ProcessQueue.get('abcde')}.should raise_error(RuntimeError)
+      
+      record.reload
+      record.queue_name.should == 'abcde'
+      record.data.should == :this_will_stay_unprocessed
+      record.processed?.should == false
+      record.token.should == nil
+    end
   end
   
   describe ".get_unique_token" do

@@ -47,16 +47,24 @@ module RudeQ
     def get(queue_name)
       qname = sanitize_queue_name(queue_name)
       token = get_unique_token
-    
-      self.update_all(["token = ?", token], ["queue_name = ? AND processed = ? AND token IS NULL", qname, false], :limit => 1, :order => "id ASC")
-      queued = self.find_by_queue_name_and_token_and_processed(qname, token, false)
-      if queued
-        queued.update_attribute(:processed, true)
-        return queued.data
-      else
-        return nil # in line with Starling
+      
+      transaction do
+        self.update_all(["token = ?", token], ["queue_name = ? AND processed = ? AND token IS NULL", qname, false], :limit => 1, :order => "id ASC")
+        queued = self.find_by_queue_name_and_token_and_processed(qname, token, false)
+        if queued
+          processed!(queued)
+          return queued.data
+        else
+          return nil # in line with Starling
+        end
       end
     end
+    
+    # class method to make it more easily stubbed
+    def processed!(record)
+      record.update_attribute(:processed, true)
+    end
+    protected :processed!
   
     def get_unique_token # :nodoc:
 
