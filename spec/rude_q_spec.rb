@@ -95,14 +95,14 @@ describe ProcessQueue do
       ProcessQueue.get('abcde').should be(nil)
     end
     
-    it "should revert any token setting / processing if something goes wrong before it retrieves the data" do
+    it ", unfortunately, should not revert a record if something goes wrong before it finishes" do
       ProcessQueue.should_receive(:processed!).and_raise(RuntimeError)
-      ProcessQueue.set('abcde', :this_will_stay_unprocessed)
+      ProcessQueue.set('abcde', :this_will_remain_tokenised)
       
       # confirm the object is in the db
       record = ProcessQueue.find(:first, :order => "id DESC")
       record.queue_name.should == 'abcde'
-      record.data.should == :this_will_stay_unprocessed
+      record.data.should == :this_will_remain_tokenised
       record.processed?.should == false
       record.token.should == nil
       
@@ -110,9 +110,9 @@ describe ProcessQueue do
       
       record.reload
       record.queue_name.should == 'abcde'
-      record.data.should == :this_will_stay_unprocessed
+      record.data.should == :this_will_remain_tokenised
       record.processed?.should == false
-      record.token.should == nil
+      record.token.should_not == nil
     end
   end
   
