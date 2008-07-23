@@ -65,7 +65,8 @@ module RudeQ
     end
     
     # class method to make it more easily stubbed
-    def processed!(record)
+    def processed!(record) # :nodoc:
+      # TODO: allow :set_flag and :destroy as :processed! options
       record.update_attribute(:processed, true)
     end
     protected :processed!
