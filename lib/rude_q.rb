@@ -55,7 +55,7 @@ module RudeQ
           processed!(queued)
           return queued.data
         else
-          return nil # in line with Starling
+          return nil # Starling waits indefinitely for a corresponding queue item
         end
       end
     end
