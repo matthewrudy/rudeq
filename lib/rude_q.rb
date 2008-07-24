@@ -46,22 +46,29 @@ module RudeQ
     #  -> nil
     def get(queue_name)
       qname = sanitize_queue_name(queue_name)
-      token = get_unique_token
       
-      # TODO: consider moving to a simple ActiveRecord :lock => true
-      #   queued = self.find_by_queue_name_and_processed(qname, false, :lock => true)
-      # in innodb this gives us a nice row lock
-      #
-      # if we use a transaction with the current tokenised lock
-      # its equivalent to a table lock == :bad
-      self.update_all(["token = ?", token], ["queue_name = ? AND processed = ? AND token IS NULL", qname, false], :limit => 1, :order => "id ASC")
-      queued = self.find_by_queue_name_and_token_and_processed(qname, token, false)
-      if queued
-        processed!(queued)
-        return queued.data
-      else
-        return nil # Starling waits indefinitely for a corresponding queue item
+      fetch_with_lock(qname) do |record|
+        if record
+          processed!(record)
+          return record.data
+        else
+          return nil # Starling waits indefinitely for a corresponding queue item
+        end
       end
+    end
+
+    # TODO: consider moving to a simple ActiveRecord :lock => true
+    #   queued = self.find_by_queue_name_and_processed(qname, false, :lock => true)
+    # in innodb this gives us a nice row lock
+    #
+    # if we use a transaction with the current tokenised lock
+    # its equivalent to a table lock == :bad
+    def fetch_with_lock(qname) # :nodoc:
+      token = get_unique_token
+      self.update_all(["token = ?", token], ["queue_name = ? AND processed = ? AND token IS NULL", qname, false], :limit => 1, :order => "id ASC")
+      record = self.find_by_queue_name_and_token_and_processed(qname, token, false)
+      
+      return yield(record)
     end
     
     # class method to make it more easily stubbed
@@ -84,13 +91,13 @@ module RudeQ
     
     protected
     
-    def token_count!
+    def token_count! # :nodoc:
       @token_count ||= 0
       @token_count += 1
       return @token_count
     end
     
-    def sanitize_queue_name(queue_name)
+    def sanitize_queue_name(queue_name) # :nodoc:
       queue_name.to_s
     end
   end
