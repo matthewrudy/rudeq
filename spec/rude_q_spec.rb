@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe ProcessQueue do
+describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
   before(:each) do
     ProcessQueue.delete_all
     create_some_noise
@@ -85,7 +85,10 @@ describe ProcessQueue do
   describe ".get" do
     it "should not return a processed item with the same token" do
       @token = "tokEEEannn"
-      ProcessQueue.should_receive(:get_unique_token).exactly(3).times.and_return(@token)
+
+      RudeQ::TokenLock.should respond_to(:get_unique_token) # ensure our stub is safe
+      RudeQ::TokenLock.should_receive(:get_unique_token).exactly(3).times.and_return(@token)
+
       @existing = ProcessQueue.create!(:queue_name => 'abcde', :data => :old_data, :token => @token, :processed => true)
 
       ProcessQueue.get('abcde').should be(nil)
@@ -115,25 +118,7 @@ describe ProcessQueue do
       record.token.should_not == nil
     end
   end
-  
-  describe ".get_unique_token" do
-    it "should create a unique token" do
-      lots_of_tokens = Array.new(50) do
-        ProcessQueue.get_unique_token
-      end
-      lots_of_tokens.uniq.should == lots_of_tokens
-    end
-    
-    it "should create a unique token even if time stands still" do
-      time_now = Time.now
-      Time.should_receive(:now).at_least(50).times.and_return(time_now)
-      lots_of_tokens = Array.new(50) do
-        ProcessQueue.get_unique_token
-      end
-      lots_of_tokens.uniq.should == lots_of_tokens
-    end
-  end
-  
+
   describe ".cleanup!" do
     it "should use :delete_all" do
       ProcessQueue.should_receive(:delete_all) # not :destroy_all
@@ -242,4 +227,26 @@ describe ProcessQueue do
       lambda { giraffe.reload }.should raise_error(ActiveRecord::RecordNotFound)
     end
   end
+end
+
+describe RudeQ::TokenLock do
+
+  describe ".get_unique_token" do
+    it "should create a unique token" do
+      lots_of_tokens = Array.new(50) do
+        RudeQ::TokenLock.get_unique_token
+      end
+      lots_of_tokens.uniq.should == lots_of_tokens
+    end
+    
+    it "should create a unique token even if time stands still" do
+      time_now = Time.now
+      Time.should_receive(:now).at_least(50).times.and_return(time_now)
+      lots_of_tokens = Array.new(50) do
+        RudeQ::TokenLock.get_unique_token
+      end
+      lots_of_tokens.uniq.should == lots_of_tokens
+    end
+  end
+  
 end

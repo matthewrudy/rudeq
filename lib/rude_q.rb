@@ -63,12 +63,8 @@ module RudeQ
     #
     # if we use a transaction with the current tokenised lock
     # its equivalent to a table lock == :bad
-    def fetch_with_lock(qname) # :nodoc:
-      token = get_unique_token
-      self.update_all(["token = ?", token], ["queue_name = ? AND processed = ? AND token IS NULL", qname, false], :limit => 1, :order => "id ASC")
-      record = self.find_by_queue_name_and_token_and_processed(qname, token, false)
-      
-      return yield(record)
+    def fetch_with_lock(qname, &block) # :nodoc:
+      RudeQ::TokenLock.fetch_with_lock(self, qname, &block)
     end
     
     # class method to make it more easily stubbed
@@ -77,28 +73,40 @@ module RudeQ
       record.update_attribute(:processed, true)
     end
     protected :processed!
-  
-    def get_unique_token # :nodoc:
 
-      digest = Digest::SHA1.new
-      digest << Time.now.to_s
-      digest << Process.pid.to_s
-      digest << Socket.gethostname
-      digest << self.token_count!.to_s # multiple requests from the same pid in the same second get different token
-    
-      return digest.hexdigest
-    end
-    
-    protected
-    
-    def token_count! # :nodoc:
-      @token_count ||= 0
-      @token_count += 1
-      return @token_count
-    end
+    private
     
     def sanitize_queue_name(queue_name) # :nodoc:
       queue_name.to_s
     end
   end
+
+  module TokenLock
+    class << self
+      
+      def fetch_with_lock(klass, qname) # :nodoc:
+        token = get_unique_token
+        klass.update_all(["token = ?", token], ["queue_name = ? AND processed = ? AND token IS NULL", qname, false], :limit => 1, :order => "id ASC")
+        record = klass.find_by_queue_name_and_token_and_processed(qname, token, false)
+      
+        return yield(record)
+      end
+
+      def token_count! # :nodoc:
+        @token_count ||= 0
+        @token_count += 1
+        return @token_count
+      end
+
+      def get_unique_token # :nodoc:
+        digest = Digest::SHA1.new
+        digest << Time.now.to_s
+        digest << Process.pid.to_s
+        digest << Socket.gethostname
+        digest << self.token_count!.to_s # multiple requests from the same pid in the same second get different token
+        return digest.hexdigest
+      end
+    end
+  end
+
 end
