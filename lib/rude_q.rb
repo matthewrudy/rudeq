@@ -64,7 +64,7 @@ module RudeQ
     # if we use a transaction with the current tokenised lock
     # its equivalent to a table lock == :bad
     def fetch_with_lock(qname, &block) # :nodoc:
-      RudeQ::TokenLock.fetch_with_lock(self, qname, &block)
+      RudeQ::PessimisticLock.fetch_with_lock(self, qname, &block)
     end
     
     # class method to make it more easily stubbed
@@ -78,6 +78,22 @@ module RudeQ
     
     def sanitize_queue_name(queue_name) # :nodoc:
       queue_name.to_s
+    end
+  end
+  
+  module PessimisticLock
+    class << self
+      
+      def fetch_with_lock(klass, qname) # :nodoc:
+        klass.transaction do
+          record = klass.find(:first,
+            :conditions => {:queue_name => qname, :processed => false},
+            :lock => true, :order => "id ASC", :limit => 1)
+      
+          return yield(record)
+        end
+      end
+    
     end
   end
 

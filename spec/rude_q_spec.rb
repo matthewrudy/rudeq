@@ -3,13 +3,13 @@ require File.dirname(__FILE__) + '/spec_helper'
 describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
   before(:each) do
     ProcessQueue.delete_all
+    ProcessQueue.raise_on_processed = false
     create_some_noise
   end
   
   def create_some_noise
     ProcessQueue.create!(:queue_name => "doNT use this in Specs", :data => {:not => "to be messed with"})
     ProcessQueue.create!(:queue_name => "abcde", :data => {:same_as => "the specs but already processed"}, :processed => true)
-    ProcessQueue.create!(:queue_name => "abcde", :data => {:same_as => "the specs but with token"}, :token => "    unlikely    ")
   end
   
   describe "get and set" do
@@ -82,30 +82,15 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
     end
   end
   
-  describe ".get" do
-    it "should not return a processed item with the same token" do
-      @token = "tokEEEannn"
-
-      RudeQ::TokenLock.should respond_to(:get_unique_token) # ensure our stub is safe
-      RudeQ::TokenLock.should_receive(:get_unique_token).exactly(3).times.and_return(@token)
-
-      @existing = ProcessQueue.create!(:queue_name => 'abcde', :data => :old_data, :token => @token, :processed => true)
-
-      ProcessQueue.get('abcde').should be(nil)
-        
-      ProcessQueue.set('abcde', :new_data)
-      ProcessQueue.get('abcde').should == :new_data
-      ProcessQueue.get('abcde').should be(nil)
-    end
-    
-    it ", unfortunately, should not revert a record if something goes wrong before it finishes" do
-      ProcessQueue.should_receive(:processed!).and_raise(RuntimeError)
-      ProcessQueue.set('abcde', :this_will_remain_tokenised)
+  describe ".get" do    
+    it "should revert a record if something goes wrong before it finishes" do
+      ProcessQueue.raise_on_processed = true
+      ProcessQueue.set('abcde', :this_will_remain_unprocessed)
       
       # confirm the object is in the db
       record = ProcessQueue.find(:first, :order => "id DESC")
       record.queue_name.should == 'abcde'
-      record.data.should == :this_will_remain_tokenised
+      record.data.should == :this_will_remain_unprocessed
       record.processed?.should == false
       record.token.should == nil
       
@@ -113,9 +98,9 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       
       record.reload
       record.queue_name.should == 'abcde'
-      record.data.should == :this_will_remain_tokenised
+      record.data.should == :this_will_remain_unprocessed
       record.processed?.should == false
-      record.token.should_not == nil
+      record.token.should == nil
     end
   end
 
@@ -248,5 +233,20 @@ describe RudeQ::TokenLock do
       lots_of_tokens.uniq.should == lots_of_tokens
     end
   end
+  
+  # it "should not return a processed item with the same token" do
+  #   @token = "tokEEEannn"
+  # 
+  #   RudeQ::TokenLock.should respond_to(:get_unique_token) # ensure our stub is safe
+  #   RudeQ::TokenLock.should_receive(:get_unique_token).exactly(3).times.and_return(@token)
+  # 
+  #   @existing = ProcessQueue.create!(:queue_name => 'abcde', :data => :old_data, :token => @token, :processed => true)
+  # 
+  #   ProcessQueue.get('abcde').should be(nil)
+  #     
+  #   ProcessQueue.set('abcde', :new_data)
+  #   ProcessQueue.get('abcde').should == :new_data
+  #   ProcessQueue.get('abcde').should be(nil)
+  # end
   
 end
