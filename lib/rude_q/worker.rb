@@ -1,13 +1,24 @@
-# example usage:
-# class MyWorker < RudeQ::Worker
-#   def queue_name
-#     :my_queue
+# example worker class: lib/my_worker.rb
+#   class MyWorker < RudeQ::Worker
+#     def queue_name
+#       :my_queue
+#     end
+#
+#     def do_work(data)
+#       MyMailer.send(data)
+#     end
 #   end
 #
-#   def do_work(data)
-#     MyMailer.send(data)
+# example rake file: lib/tasks/worker.rake
+#   namespace :worker do
+#     desc "fire off a worker"
+#     task :do => :environment do
+#       worker = MyWorker.new
+#       worker.do!
+#     end
 #   end
-# end
+#
+# then add a cron job to run "cd /path/to/wherever && rake worker:do RAILS_ENV=production"
 module RudeQ
   class Worker
     def queue_name
