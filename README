@@ -13,7 +13,6 @@ RudeQ
 INSTALL
 ============
 This plugin requires Rails 2.* currently, and has only been tested on MySQL.
-It definitely does not work on SQLite (as it requires :limit and :order options for a SQL UPDATE command)
 
 On rails 2.1 you can install straight from github:
   ruby script/plugin install git://github.com/matthewrudy/rudeq.git
