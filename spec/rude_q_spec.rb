@@ -115,6 +115,42 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
     end
   end
   
+  describe "queue_options" do
+    describe :processed do
+      describe "set to :destroy" do
+        before(:each) do
+          @old_processed = ProcessQueue.queue_options[:processed]
+          ProcessQueue.queue_options[:processed] = :destroy
+        end
+        after(:each) do
+          ProcessQueue.queue_options[:processed] = @old_processed
+        end
+        it "should delete processed items" do
+          count = ProcessQueue.count
+          
+          ProcessQueue.set(:abcde, "some value")
+          ProcessQueue.count.should == (count + 1)
+          
+          ProcessQueue.get(:abcde).should == "some value"
+          ProcessQueue.count.should == count
+        end
+      end
+      describe "set to something crazy" do
+        before(:each) do
+          @old_processed = ProcessQueue.queue_options[:processed]
+          ProcessQueue.queue_options[:processed] = :something_crazy
+        end
+        after(:each) do
+          ProcessQueue.queue_options[:processed] = @old_processed
+        end
+        it "should raise an exception" do
+          ProcessQueue.set(:abcde, "some value")
+          lambda {ProcessQueue.get(:abcde)}.should raise_error(ArgumentError)
+        end
+      end
+    end
+  end
+  
   describe ".backlog" do
     it "should count the unprocessed items for the provided queue_name" do
       ProcessQueue.backlog(:abcde).should == 0

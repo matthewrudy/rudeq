@@ -72,15 +72,39 @@ module RudeQ
     end
     
     def fetch_with_lock(qname, &block) # :nodoc:
-      RudeQ::PessimisticLock.fetch_with_lock(self, qname, &block)
+      lock = case queue_options[:lock]
+      when :pessimistic : RudeQ::PessimisticLock
+      when :token       : RudeQ::TokenLock
+      else
+        raise(ArgumentError, "bad queue_option for :lock - #{queue_options[:lock].inspect}")
+      end
+      lock.fetch_with_lock(self, qname, &block)
     end
     
     # class method to make it more easily stubbed
     def processed!(record) # :nodoc:
-      # TODO: allow :set_flag and :destroy as :processed! options
-      record.update_attribute(:processed, true)
+      case queue_options[:processed]
+      when :set_flag
+        record.update_attribute(:processed, true)
+      when :destroy
+        record.destroy
+      else
+        raise(ArgumentError, "bad queue_option for :processed - #{queue_options[:processed].inspect}")
+      end
     end
     protected :processed!
+    
+    # configure your RudeQ
+    # ==== :processed - what do we do after retrieving a queue item?
+    # * <tt>:set_flag</tt> - set the +processed+ flag to +true+ (keep data in the db) [*default*]
+    # * <tt>:destroy</tt>  - destroy the processed item (keep our queue as lean as possible
+    #
+    # ==== :lock - what locking method should we use?
+    # * <tt>:pessimistic</tt> - RudeQ::PessimisticLock [*default*]
+    # * <tt>:token</tt>       - RudeQ::TokenLock
+    def queue_options
+      @queue_options ||= {:processed => :set_flag, :lock => :pessimistic}
+    end
 
     private
     

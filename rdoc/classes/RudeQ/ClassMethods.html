@@ -80,8 +80,10 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
+      <a href="#M000004">backlog</a>&nbsp;&nbsp;
       <a href="#M000001">cleanup!</a>&nbsp;&nbsp;
       <a href="#M000003">get</a>&nbsp;&nbsp;
+      <a href="#M000005">queue_options</a>&nbsp;&nbsp;
       <a href="#M000002">set</a>&nbsp;&nbsp;
       </div>
     </div>
@@ -103,6 +105,33 @@
     <!-- if method_list -->
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000004" class="method-detail">
+        <a name="M000004"></a>
+
+        <div class="method-heading">
+          <a href="#M000004" class="method-signature">
+          <span class="method-name">backlog</span><span class="method-args">(queue_name)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+A snapshot count of unprocessed items for the given <tt>queue_name</tt>
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000004-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000004-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rude_q.rb, line 69</span>
+69:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">backlog</span>(<span class="ruby-identifier">queue_name</span>)
+70:       <span class="ruby-identifier">qname</span> = <span class="ruby-identifier">sanitize_queue_name</span>(<span class="ruby-identifier">queue_name</span>)
+71:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">:conditions</span> =<span class="ruby-operator">&gt;</span> {<span class="ruby-identifier">:queue_name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">qname</span>, <span class="ruby-identifier">:processed</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">false</span>})
+72:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
 
       <div id="method-M000001" class="method-detail">
         <a name="M000001"></a>
@@ -177,6 +206,54 @@ are treated the same)
 64:         <span class="ruby-keyword kw">end</span>
 65:       <span class="ruby-keyword kw">end</span>
 66:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000005" class="method-detail">
+        <a name="M000005"></a>
+
+        <div class="method-heading">
+          <a href="#M000005" class="method-signature">
+          <span class="method-name">queue_options</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+configure your <a href="../RudeQ.html">RudeQ</a>
+</p>
+<h4>:processed - what do we do after retrieving a queue item?</h4>
+<ul>
+<li><tt>:set_flag</tt> - <a href="ClassMethods.html#M000002">set</a> the
+<tt>processed</tt> flag to <tt>true</tt> (keep data in the db)
+[<b>default</b>]
+
+</li>
+<li><tt>:destroy</tt> - destroy the processed item (keep our queue as lean as
+possible
+
+</li>
+</ul>
+<h4>:lock - what locking method should we use?</h4>
+<ul>
+<li><tt>:pessimistic</tt> - <a
+href="PessimisticLock.html">RudeQ::PessimisticLock</a> [<b>default</b>]
+
+</li>
+<li><tt>:token</tt> - <a href="TokenLock.html">RudeQ::TokenLock</a>
+
+</li>
+</ul>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000005-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000005-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/rude_q.rb, line 105</span>
+105:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">queue_options</span>
+106:       <span class="ruby-ivar">@queue_options</span> <span class="ruby-operator">||=</span> {<span class="ruby-identifier">:processed</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:set_flag</span>, <span class="ruby-identifier">:lock</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:pessimistic</span>}
+107:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
