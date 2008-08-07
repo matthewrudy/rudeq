@@ -5,10 +5,10 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Module: RudeQ</title>
+  <title>Module: RudeQ::PessimisticLock</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <meta http-equiv="Content-Script-Type" content="text/javascript" />
-  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
   <script type="text/javascript">
   // <![CDATA[
 
@@ -50,16 +50,12 @@
         <table class="header-table">
         <tr class="top-aligned-row">
           <td><strong>Module</strong></td>
-          <td class="class-name-in-header">RudeQ</td>
+          <td class="class-name-in-header">RudeQ::PessimisticLock</td>
         </tr>
         <tr class="top-aligned-row">
             <td><strong>In:</strong></td>
             <td>
-                <a href="../files/lib/rude_q/worker_rb.html">
-                lib/rude_q/worker.rb
-                </a>
-        <br />
-                <a href="../files/lib/rude_q_rb.html">
+                <a href="../../files/lib/rude_q_rb.html">
                 lib/rude_q.rb
                 </a>
         <br />
@@ -78,19 +74,13 @@
 
     <div id="description">
       <p>
-simply doing;
+uses standard ActiveRecord :lock =&gt; true this will invoke a lock on the
+particular queue
 </p>
 <pre>
-  class RudeQueue &lt; ActiveRecord::Base
-    include RudeQ
-  end
-</pre>
-<p>
-will include <a href="RudeQ/ClassMethods.html">RudeQ::ClassMethods</a>
-</p>
-<pre>
-  :get
-  :set
+  eg. daemon1: RudeQueue.get(:abc)
+      daemon2: RudeQueue.get(:abc) - will have to wait for daemon1 to finish
+      daemon3: RudeQueue.get(:def) - will avoid the lock
 </pre>
 
     </div>
@@ -106,15 +96,6 @@ will include <a href="RudeQ/ClassMethods.html">RudeQ::ClassMethods</a>
 
     <div id="section">
 
-    <div id="class-list">
-      <h3 class="section-bar">Classes and Modules</h3>
-
-      Module <a href="RudeQ/ClassMethods.html" class="link">RudeQ::ClassMethods</a><br />
-Module <a href="RudeQ/PessimisticLock.html" class="link">RudeQ::PessimisticLock</a><br />
-Module <a href="RudeQ/TokenLock.html" class="link">RudeQ::TokenLock</a><br />
-Class <a href="RudeQ/Worker.html" class="link">RudeQ::Worker</a><br />
-
-    </div>
 
 
 

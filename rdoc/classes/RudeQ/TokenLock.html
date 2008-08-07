@@ -72,6 +72,18 @@
 
   <div id="contextContent">
 
+    <div id="description">
+      <p>
+a crazy hack around database locking that I thought was a good idea turns
+out we can&#8216;t make it use transactions properly without creating a
+whole table lock which misses the point
+</p>
+<p>
+also, it doesn&#8216;t work on SQLite as it requires &quot;UPDATE &#8230;
+LIMIT 1 ORDER id ASC&quot;
+</p>
+
+    </div>
 
 
    </div>

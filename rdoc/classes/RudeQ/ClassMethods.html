@@ -80,9 +80,9 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000002">cleanup!</a>&nbsp;&nbsp;
-      <a href="#M000004">get</a>&nbsp;&nbsp;
-      <a href="#M000003">set</a>&nbsp;&nbsp;
+      <a href="#M000001">cleanup!</a>&nbsp;&nbsp;
+      <a href="#M000003">get</a>&nbsp;&nbsp;
+      <a href="#M000002">set</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -104,11 +104,11 @@
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000002" class="method-detail">
-        <a name="M000002"></a>
+      <div id="method-M000001" class="method-detail">
+        <a name="M000001"></a>
 
         <div class="method-heading">
-          <a href="#M000002" class="method-signature">
+          <a href="#M000001" class="method-signature">
           <span class="method-name">cleanup!</span><span class="method-args">(expiry=1.hour)</span>
           </a>
         </div>
@@ -122,68 +122,13 @@ Cleanup old processed items
   RudeQueue.cleanup!(1.week)
 </pre>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000002-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000002-source">
+            onclick="toggleCode('M000001-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000001-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/rude_q.rb, line 15</span>
-15:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">cleanup!</span>(<span class="ruby-identifier">expiry</span>=<span class="ruby-value">1</span>.<span class="ruby-identifier">hour</span>)
-16:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">delete_all</span>([<span class="ruby-value str">&quot;processed = ? AND updated_at &lt; ?&quot;</span>, <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">expiry</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">ago</span>])
-17:     <span class="ruby-keyword kw">end</span>
-</pre>
-          </div>
-        </div>
-      </div>
-
-      <div id="method-M000004" class="method-detail">
-        <a name="M000004"></a>
-
-        <div class="method-heading">
-          <a href="#M000004" class="method-signature">
-          <span class="method-name">get</span><span class="method-args">(queue_name)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p>
-Grab the first item from the queue <b>queue_name</b> (strings and symbols
-are treated the same)
-</p>
-<ul>
-<li>it should always come out the same as it went in
-
-</li>
-<li>they should always come out in the same order they went in
-
-</li>
-<li>it will return a nil if there is no unprocessed entry in the queue
-
-</li>
-</ul>
-<pre>
- RudeQueue.get(21)
- -&gt; {:a =&gt; &quot;hash&quot;}
- RudeQueue.get(:a_symbol)
- -&gt; 255
- RudeQueue.get(&quot;a string&quot;)
- -&gt; nil
-</pre>
-          <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000004-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000004-source">
-<pre>
-    <span class="ruby-comment cmt"># File lib/rude_q.rb, line 47</span>
-47:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get</span>(<span class="ruby-identifier">queue_name</span>)
-48:       <span class="ruby-identifier">qname</span> = <span class="ruby-identifier">sanitize_queue_name</span>(<span class="ruby-identifier">queue_name</span>)
-49:       
-50:       <span class="ruby-identifier">fetch_with_lock</span>(<span class="ruby-identifier">qname</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">record</span><span class="ruby-operator">|</span>
-51:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">record</span>
-52:           <span class="ruby-identifier">processed!</span>(<span class="ruby-identifier">record</span>)
-53:           <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">record</span>.<span class="ruby-identifier">data</span>
-54:         <span class="ruby-keyword kw">else</span>
-55:           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-comment cmt"># Starling waits indefinitely for a corresponding queue item</span>
-56:         <span class="ruby-keyword kw">end</span>
-57:       <span class="ruby-keyword kw">end</span>
-58:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/rude_q.rb, line 23</span>
+23:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">cleanup!</span>(<span class="ruby-identifier">expiry</span>=<span class="ruby-value">1</span>.<span class="ruby-identifier">hour</span>)
+24:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">delete_all</span>([<span class="ruby-value str">&quot;processed = ? AND updated_at &lt; ?&quot;</span>, <span class="ruby-keyword kw">true</span>, <span class="ruby-identifier">expiry</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">ago</span>])
+25:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -194,36 +139,84 @@ are treated the same)
 
         <div class="method-heading">
           <a href="#M000003" class="method-signature">
+          <span class="method-name">get</span><span class="method-args">(queue_name)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Grab the first item from the queue <b>queue_name</b> (strings and symbols
+are treated the same)
+</p>
+<pre>
+  - it should always come out the same as it went in
+  - they should always come out in the same order they went in
+  - it will return a nil if there is no unprocessed entry in the queue
+
+  &gt;&gt; RudeQueue.get(21)
+  -&gt; {:a =&gt; &quot;hash&quot;}
+  &gt;&gt; RudeQueue.get(:a_symbol)
+  -&gt; 255
+  &gt;&gt; RudeQueue.get(&quot;a string&quot;)
+  -&gt; nil
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000003-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/rude_q.rb, line 55</span>
+55:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get</span>(<span class="ruby-identifier">queue_name</span>)
+56:       <span class="ruby-identifier">qname</span> = <span class="ruby-identifier">sanitize_queue_name</span>(<span class="ruby-identifier">queue_name</span>)
+57:       
+58:       <span class="ruby-identifier">fetch_with_lock</span>(<span class="ruby-identifier">qname</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">record</span><span class="ruby-operator">|</span>
+59:         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">record</span>
+60:           <span class="ruby-identifier">processed!</span>(<span class="ruby-identifier">record</span>)
+61:           <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">record</span>.<span class="ruby-identifier">data</span>
+62:         <span class="ruby-keyword kw">else</span>
+63:           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-comment cmt"># Starling waits indefinitely for a corresponding queue item</span>
+64:         <span class="ruby-keyword kw">end</span>
+65:       <span class="ruby-keyword kw">end</span>
+66:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000002" class="method-detail">
+        <a name="M000002"></a>
+
+        <div class="method-heading">
+          <a href="#M000002" class="method-signature">
           <span class="method-name">set</span><span class="method-args">(queue_name, data)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p>
-Add any serialize-able <b>data</b> to the queue <b>queue_name</b> (strings
-and symbols are treated the same)
+Add any serialize-able <tt>data</tt> to the queue <tt>queue_name</tt>
+(strings and symbols are treated the same)
 </p>
 <pre>
   RudeQueue.set(:sausage_queue, Sausage.new(:sauce =&gt; &quot;yummy&quot;))
   RudeQueue.set(&quot;sausage_queue&quot;, Sausage.new(:other =&gt; true))
 
-    RudeQueue.get(&quot;sausage_queue&quot;)
-    -&gt; *yummy sausage*
-    RudeQueue.get(:sausage_queue)
-    -&gt; *other_sausage*
-    RudeQueue.get(:sausage_queue)
-    -&gt; nil
+  &gt;&gt; RudeQueue.get(&quot;sausage_queue&quot;)
+  -&gt; *yummy sausage*
+  &gt;&gt; RudeQueue.get(:sausage_queue)
+  -&gt; *other_sausage*
+  &gt;&gt; RudeQueue.get(:sausage_queue)
+  -&gt; nil
 </pre>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000003-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000003-source">
+            onclick="toggleCode('M000002-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000002-source">
 <pre>
-    <span class="ruby-comment cmt"># File lib/rude_q.rb, line 30</span>
-30:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set</span>(<span class="ruby-identifier">queue_name</span>, <span class="ruby-identifier">data</span>)
-31:       <span class="ruby-identifier">queue_name</span> = <span class="ruby-identifier">sanitize_queue_name</span>(<span class="ruby-identifier">queue_name</span>)
-32:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create!</span>(<span class="ruby-identifier">:queue_name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">queue_name</span>, <span class="ruby-identifier">:data</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">data</span>)
-33:       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-comment cmt"># in line with Starling</span>
-34:     <span class="ruby-keyword kw">end</span>
+    <span class="ruby-comment cmt"># File lib/rude_q.rb, line 38</span>
+38:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set</span>(<span class="ruby-identifier">queue_name</span>, <span class="ruby-identifier">data</span>)
+39:       <span class="ruby-identifier">queue_name</span> = <span class="ruby-identifier">sanitize_queue_name</span>(<span class="ruby-identifier">queue_name</span>)
+40:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create!</span>(<span class="ruby-identifier">:queue_name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">queue_name</span>, <span class="ruby-identifier">:data</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">data</span>)
+41:       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-comment cmt"># in line with Starling</span>
+42:     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
