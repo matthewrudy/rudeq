@@ -65,6 +65,12 @@ module RudeQ
       end
     end
 
+    # A snapshot count of unprocessed items for the given +queue_name+
+    def backlog(queue_name)
+      qname = sanitize_queue_name(queue_name)
+      self.count(:conditions => {:queue_name => qname, :processed => false})
+    end
+    
     def fetch_with_lock(qname, &block) # :nodoc:
       RudeQ::PessimisticLock.fetch_with_lock(self, qname, &block)
     end
