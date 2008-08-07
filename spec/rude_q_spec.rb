@@ -31,6 +31,17 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       ProcessQueue.set('abcde', hash)
       ProcessQueue.get('abcde').should == hash
     end
+    it "should work with integers" do
+      ProcessQueue.set('abcde', 7816327370)
+      ProcessQueue.get('abcde').should == 7816327370
+    end
+    it "unfortunately doesnt resolve booleans correctly" do
+      ProcessQueue.set('abcde', true)
+      ProcessQueue.get('abcde').should == 1
+      
+      ProcessQueue.set('abcde', false)
+      ProcessQueue.get('abcde').should == 0
+    end
     
     it "should :get in the same order they are :set" do
       ProcessQueue.set('abcde', :first)
