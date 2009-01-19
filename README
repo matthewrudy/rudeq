@@ -43,6 +43,9 @@ After you've installed it just run
 
       RudeQueue.set(:queue_name, RandomObject)
       RudeQueue.get(:queue_name)
+      RudeQueue.fetch(:queue_name) do |data|
+        process(data)
+      end
 
   And, to keep the queue running fast,
   set up a cron job to run
