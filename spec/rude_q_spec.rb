@@ -114,7 +114,51 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       record.token.should == nil
     end
   end
+
+  describe "fetch" do
+    describe "with data" do
+      
+      before(:each) do
+        ProcessQueue.set(:fetch_queue, "some data")
+      end
   
+      it "should return the value of the block" do
+        rtn = ProcessQueue.fetch(:fetch_queue) do |data|
+          data.should == "some data"
+          :the_return
+        end
+        rtn.should == :the_return
+      end
+
+      it "should execute the block with the data" do
+        self.should_receive(:something)
+        ProcessQueue.fetch(:fetch_queue) do |data|
+          self.something
+          data.should == "some data"
+        end
+      end
+
+    end
+
+    describe "without data" do
+
+      it "should not execute the block" do
+        self.should_not_receive(:something)
+        ProcessQueue.fetch(:fetch_queue) do |data|
+          raise(Exception, "this should never get here")
+        end
+      end
+
+      it "should return nil" do
+        rtn = ProcessQueue.fetch(:fetch_queue) do |data|
+          raise(Exception, "again this shouldnt happen")
+        end
+        rtn.should be_nil
+      end
+
+    end
+  end
+
   describe "queue_options" do
     describe :processed do
       describe "set to :destroy" do

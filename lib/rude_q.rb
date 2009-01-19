@@ -65,6 +65,26 @@ module RudeQ
       end
     end
 
+    # Grab the first item from the queue, and execute the supplied block if there is one
+    #   - it will return the value of the block
+    #
+    #   >> RudeQueue.fetch(:my_queue) do |data|
+    #   >>   Monster.devour(data)
+    #   >> end
+    #   -> nil
+    #
+    #   >> status = RudeQueue.fetch(:my_queue) do |data|
+    #   >>   process(data) # returns the value :update in this case
+    #   >> end
+    #   -> :update
+    #   >> status
+    #   -> :update
+    def fetch(queue_name, &block)
+      if data = get(queue_name)
+        return block.call(data)
+      end
+    end
+
     # A snapshot count of unprocessed items for the given +queue_name+
     def backlog(queue_name)
       qname = sanitize_queue_name(queue_name)
