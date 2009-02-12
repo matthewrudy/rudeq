@@ -91,7 +91,7 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
   
   describe ".set" do
     it "should delegate to :create!" do
-      ProcessQueue.should_receive(:create!).with(:queue_name => 'abcde', :data => YAML.dump(:magical_planet))
+      ProcessQueue.should_receive(:create!).with(:queue_name => 'abcde', :data => :magical_planet)
       ProcessQueue.set('abcde', :magical_planet)
     end
     it "should return nil" do
@@ -107,7 +107,7 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       # confirm the object is in the db
       record = ProcessQueue.find(:first, :order => "id DESC")
       record.queue_name.should == 'abcde'
-      record.data.should == YAML.dump(:this_will_remain_unprocessed)
+      record.data.should == :this_will_remain_unprocessed
       record.processed?.should == false
       record.token.should == nil
       
@@ -115,7 +115,7 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       
       record.reload
       record.queue_name.should == 'abcde'
-      record.data.should == YAML.dump(:this_will_remain_unprocessed)
+      record.data.should == :this_will_remain_unprocessed
       record.processed?.should == false
       record.token.should == nil
     end

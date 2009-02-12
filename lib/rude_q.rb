@@ -11,8 +11,18 @@ module RudeQ
 
   def self.included(mod) # :nodoc:
     mod.extend(ClassMethods)
+    mod.send(:include, InstanceMethods)
   end
-  
+
+  module InstanceMethods
+    def data # :nodoc:
+      YAML.load(self[:data])
+    end
+    def data=(value) # :nodoc:
+      self[:data] = YAML.dump(value)
+    end
+  end
+
   module ClassMethods
     # Cleanup old processed items
     #
@@ -36,8 +46,7 @@ module RudeQ
     def set(queue_name, data)
       queue_name = sanitize_queue_name(queue_name)
 
-      yaml_data = YAML.dump(data)
-      self.create!(:queue_name => queue_name, :data => yaml_data)
+      self.create!(:queue_name => queue_name, :data => data)
       return nil # in line with Starling
     end
 
@@ -58,7 +67,7 @@ module RudeQ
       fetch_with_lock(qname) do |record|
         if record
           processed!(record)
-          return YAML.load(record.data)
+          return record.data
         else
           return nil # Starling waits indefinitely for a corresponding queue item
         end
@@ -137,6 +146,12 @@ module RudeQ
       @queue_options ||= {:processed => :set_flag, :lock => :pessimistic}
     end
 
+    def data # :nodoc:
+      YAML.load(self[:data])
+    end
+    def data=(value) # :nodoc:
+      self[:data] = YAML.dump(value)
+    end
     private
     
     def sanitize_queue_name(queue_name) # :nodoc:
