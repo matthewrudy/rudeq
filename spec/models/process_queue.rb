@@ -11,3 +11,4 @@ class ProcessQueue < ActiveRecord::Base
   end
     
 end
+

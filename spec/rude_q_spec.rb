@@ -35,6 +35,12 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       ProcessQueue.set('abcde', 7816327370)
       ProcessQueue.get('abcde').should == 7816327370
     end
+    it "should work with ActiveRecords" do
+      record = Something.create!(:name => "MatthewRudy")
+
+      ProcessQueue.set('abcde', record)
+      ProcessQueue.get('abcde').should == record
+    end
     it "should resolve booleans correctly" do
       ProcessQueue.set('abcde', true)
       ProcessQueue.get('abcde').should == true

@@ -9,4 +9,11 @@ ActiveRecord::Schema.define(:version => 1) do
   end
   add_index :process_queues, :processed
   add_index :process_queues, [:queue_name, :processed]
+
+  create_table :somethings, :force => true do |t|
+    t.string :name
+    t.integer :count
+    
+    t.timestamps
+  end
 end
