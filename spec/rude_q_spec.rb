@@ -197,18 +197,24 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
   
   describe ".backlog" do
     it "should count the unprocessed items for the provided queue_name" do
+      ProcessQueue.delete_all
+
       ProcessQueue.backlog(:abcde).should == 0
-      
+      ProcessQueue.backlog().should == 0
+
       ProcessQueue.set(:abcde, "a value")
       ProcessQueue.backlog(:abcde).should == 1
-      
+      ProcessQueue.backlog().should == 1
+
       ProcessQueue.set(:something_else, "another value")
       3.times { ProcessQueue.set(:abcde, :add_three_more)}
       
       ProcessQueue.backlog(:abcde).should == 4
-      
+      ProcessQueue.backlog().should == 5
+
       ProcessQueue.get(:abcde).should == "a value"
       ProcessQueue.backlog(:abcde).should == 3
+      ProcessQueue.backlog().should == 4
     end
   end
 

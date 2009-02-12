@@ -1,5 +1,4 @@
 # RudeQ
-require 'digest/sha1'
 
 # simply doing;
 #   class RudeQueue < ActiveRecord::Base
@@ -86,9 +85,20 @@ module RudeQ
     end
 
     # A snapshot count of unprocessed items for the given +queue_name+
-    def backlog(queue_name)
-      qname = sanitize_queue_name(queue_name)
-      self.count(:conditions => {:queue_name => qname, :processed => false})
+    #
+    #   >> RudeQueue.backlog
+    #   -> 265
+    #   >> RudeQueue.backlog(:one_queue)
+    #   -> 212
+    #   >> RudeQueue.backlog(:another_queue)
+    #   -> 53
+    #
+    def backlog(queue_name=nil)
+      conditions = {:processed => false}
+      if queue_name
+        conditions[:queue_name] = sanitize_queue_name(queue_name)
+      end
+      self.count(:conditions => conditions)
     end
     
     def fetch_with_lock(qname, &block) # :nodoc:
@@ -161,8 +171,11 @@ module RudeQ
   # which misses the point
   #
   # also, it doesn't work on SQLite as it requires "UPDATE ... LIMIT 1 ORDER id ASC"
+  # and as of RudeQueue2, you'll need to manually add the "token" column
   module TokenLock
     class << self
+      
+      require 'digest/sha1'
       
       def fetch_with_lock(klass, qname) # :nodoc:
         token = get_unique_token

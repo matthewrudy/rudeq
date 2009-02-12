@@ -3,7 +3,6 @@ class <%= migration_name %> < ActiveRecord::Migration
     create_table :<%= table_name %> do |t|
       t.string :queue_name
       t.text :data
-      t.string :token, :default => nil
       t.boolean :processed, :default => false, :null => false
 <% unless options[:skip_timestamps] %>
       t.timestamps
