@@ -33,7 +33,6 @@ module RudeQ
     end
   
     # Add any serialize-able +data+ to the queue +queue_name+ (strings and symbols are treated the same)
-    #
     #   RudeQueue.set(:sausage_queue, Sausage.new(:sauce => "yummy"))
     #   RudeQueue.set("sausage_queue", Sausage.new(:other => true))
     #
@@ -217,5 +216,5 @@ module RudeQ
       end
     end
   end
-
 end
+

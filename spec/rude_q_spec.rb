@@ -1,117 +1,117 @@
 require File.dirname(__FILE__) + '/spec_helper'
 
-describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
+describe RudeQ::ClassMethods do # RudeQueue extends ClassMethods
   before(:each) do
-    ProcessQueue.delete_all
-    ProcessQueue.raise_on_processed = false
+    RudeQueue.delete_all
+    RudeQueue.raise_on_processed = false
     create_some_noise
   end
   
   def create_some_noise
-    ProcessQueue.create!(:queue_name => "doNT use this in Specs", :data => {:not => "to be messed with"})
-    ProcessQueue.create!(:queue_name => "abcde", :data => {:same_as => "the specs but already processed"}, :processed => true)
+    RudeQueue.create!(:queue_name => "doNT use this in Specs", :data => {:not => "to be messed with"})
+    RudeQueue.create!(:queue_name => "abcde", :data => {:same_as => "the specs but already processed"}, :processed => true)
   end
   
   describe "get and set" do
     it "should work with strings" do
-      ProcessQueue.set('abcde', "Something to set")
-      ProcessQueue.get('abcde').should == "Something to set"
+      RudeQueue.set('abcde', "Something to set")
+      RudeQueue.get('abcde').should == "Something to set"
     end
     it "should work with symbols" do
-      ProcessQueue.set('abcde', :a_symbol)
-      ProcessQueue.get('abcde').should == :a_symbol
+      RudeQueue.set('abcde', :a_symbol)
+      RudeQueue.get('abcde').should == :a_symbol
     end
     it "should work with arrays" do
       array = [1, :b, "C"]
-      ProcessQueue.set('abcde', array)
-      ProcessQueue.get('abcde').should == array
+      RudeQueue.set('abcde', array)
+      RudeQueue.get('abcde').should == array
     end
     it "should work with hashes" do
       hash = {:symbol => "A string", "stringy" => 23, 74 => :cheese}
-      ProcessQueue.set('abcde', hash)
-      ProcessQueue.get('abcde').should == hash
+      RudeQueue.set('abcde', hash)
+      RudeQueue.get('abcde').should == hash
     end
     it "should work with integers" do
-      ProcessQueue.set('abcde', 7816327370)
-      ProcessQueue.get('abcde').should == 7816327370
+      RudeQueue.set('abcde', 7816327370)
+      RudeQueue.get('abcde').should == 7816327370
     end
     it "should work with ActiveRecords" do
       record = Something.create!(:name => "MatthewRudy")
 
-      ProcessQueue.set('abcde', record)
-      ProcessQueue.get('abcde').should == record
+      RudeQueue.set('abcde', record)
+      RudeQueue.get('abcde').should == record
     end
     it "should resolve booleans correctly" do
-      ProcessQueue.set('abcde', true)
-      ProcessQueue.get('abcde').should == true
+      RudeQueue.set('abcde', true)
+      RudeQueue.get('abcde').should == true
       
-      ProcessQueue.set('abcde', false)
-      ProcessQueue.get('abcde').should == false
+      RudeQueue.set('abcde', false)
+      RudeQueue.get('abcde').should == false
     end
     
     it "should :get in the same order they are :set" do
-      ProcessQueue.set('abcde', :first)
-      ProcessQueue.set('abcde', "second")
+      RudeQueue.set('abcde', :first)
+      RudeQueue.set('abcde', "second")
       
-      ProcessQueue.get('abcde').should == :first
+      RudeQueue.get('abcde').should == :first
       
-      ProcessQueue.set('abcde', 33.3333)
+      RudeQueue.set('abcde', 33.3333)
       
-      ProcessQueue.get('abcde').should == "second"
-      ProcessQueue.get('abcde').should == 33.3333
-      ProcessQueue.get('abcde').should be(nil)
+      RudeQueue.get('abcde').should == "second"
+      RudeQueue.get('abcde').should == 33.3333
+      RudeQueue.get('abcde').should be(nil)
     end
     
     it "should keep queues seperated" do
-      ProcessQueue.set('queue_1', :data_1)
-      ProcessQueue.set('queue_2', "DATA2")
+      RudeQueue.set('queue_1', :data_1)
+      RudeQueue.set('queue_2', "DATA2")
       
-      ProcessQueue.get('queue_2').should == "DATA2"
-      ProcessQueue.get('queue_2').should be(nil)
-      ProcessQueue.get('queue_1').should == :data_1
-      ProcessQueue.get('queue_1').should be(nil)
+      RudeQueue.get('queue_2').should == "DATA2"
+      RudeQueue.get('queue_2').should be(nil)
+      RudeQueue.get('queue_1').should == :data_1
+      RudeQueue.get('queue_1').should be(nil)
     end
     
     it "should call to_s on inputs" do
       qname = stub("fake input")
       qname.should_receive(:to_s).exactly(:twice).and_return("fake queue name")
       
-      ProcessQueue.set(qname, ["Data"])
-      ProcessQueue.get(qname).should == ["Data"]
+      RudeQueue.set(qname, ["Data"])
+      RudeQueue.get(qname).should == ["Data"]
     end
     
     it "should work with queue name as strings or symbols" do
-      ProcessQueue.set(:bah, "something about bah")
-      ProcessQueue.get("bah").should == "something about bah"
+      RudeQueue.set(:bah, "something about bah")
+      RudeQueue.get("bah").should == "something about bah"
       
-      ProcessQueue.set("girah", {:craziness => "embodied"})
-      ProcessQueue.get(:girah).should == {:craziness => "embodied"}
+      RudeQueue.set("girah", {:craziness => "embodied"})
+      RudeQueue.get(:girah).should == {:craziness => "embodied"}
     end
   end
   
   describe ".set" do
     it "should delegate to :create!" do
-      ProcessQueue.should_receive(:create!).with(:queue_name => 'abcde', :data => :magical_planet)
-      ProcessQueue.set('abcde', :magical_planet)
+      RudeQueue.should_receive(:create!).with(:queue_name => 'abcde', :data => :magical_planet)
+      RudeQueue.set('abcde', :magical_planet)
     end
     it "should return nil" do
-      ProcessQueue.set('abcde', "something").should be(nil)
+      RudeQueue.set('abcde', "something").should be(nil)
     end
   end
   
   describe ".get" do    
     it "should revert a record if something goes wrong before it finishes" do
-      ProcessQueue.raise_on_processed = true
-      ProcessQueue.set('abcde', :this_will_remain_unprocessed)
+      RudeQueue.raise_on_processed = true
+      RudeQueue.set('abcde', :this_will_remain_unprocessed)
       
       # confirm the object is in the db
-      record = ProcessQueue.find(:first, :order => "id DESC")
+      record = RudeQueue.find(:first, :order => "id DESC")
       record.queue_name.should == 'abcde'
       record.data.should == :this_will_remain_unprocessed
       record.processed?.should == false
       record.token.should == nil
       
-      lambda {ProcessQueue.get('abcde')}.should raise_error(RuntimeError)
+      lambda {RudeQueue.get('abcde')}.should raise_error(RuntimeError)
       
       record.reload
       record.queue_name.should == 'abcde'
@@ -125,11 +125,11 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
     describe "with data" do
       
       before(:each) do
-        ProcessQueue.set(:fetch_queue, "some data")
+        RudeQueue.set(:fetch_queue, "some data")
       end
   
       it "should return the value of the block" do
-        rtn = ProcessQueue.fetch(:fetch_queue) do |data|
+        rtn = RudeQueue.fetch(:fetch_queue) do |data|
           data.should == "some data"
           :the_return
         end
@@ -138,7 +138,7 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
 
       it "should execute the block with the data" do
         self.should_receive(:something)
-        ProcessQueue.fetch(:fetch_queue) do |data|
+        RudeQueue.fetch(:fetch_queue) do |data|
           self.something
           data.should == "some data"
         end
@@ -150,13 +150,13 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
 
       it "should not execute the block" do
         self.should_not_receive(:something)
-        ProcessQueue.fetch(:fetch_queue) do |data|
+        RudeQueue.fetch(:fetch_queue) do |data|
           raise(Exception, "this should never get here")
         end
       end
 
       it "should return nil" do
-        rtn = ProcessQueue.fetch(:fetch_queue) do |data|
+        rtn = RudeQueue.fetch(:fetch_queue) do |data|
           raise(Exception, "again this shouldnt happen")
         end
         rtn.should be_nil
@@ -169,33 +169,33 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
     describe :processed do
       describe "set to :destroy" do
         before(:each) do
-          @old_processed = ProcessQueue.queue_options[:processed]
-          ProcessQueue.queue_options[:processed] = :destroy
+          @old_processed = RudeQueue.queue_options[:processed]
+          RudeQueue.queue_options[:processed] = :destroy
         end
         after(:each) do
-          ProcessQueue.queue_options[:processed] = @old_processed
+          RudeQueue.queue_options[:processed] = @old_processed
         end
         it "should delete processed items" do
-          count = ProcessQueue.count
+          count = RudeQueue.count
           
-          ProcessQueue.set(:abcde, "some value")
-          ProcessQueue.count.should == (count + 1)
+          RudeQueue.set(:abcde, "some value")
+          RudeQueue.count.should == (count + 1)
           
-          ProcessQueue.get(:abcde).should == "some value"
-          ProcessQueue.count.should == count
+          RudeQueue.get(:abcde).should == "some value"
+          RudeQueue.count.should == count
         end
       end
       describe "set to something crazy" do
         before(:each) do
-          @old_processed = ProcessQueue.queue_options[:processed]
-          ProcessQueue.queue_options[:processed] = :something_crazy
+          @old_processed = RudeQueue.queue_options[:processed]
+          RudeQueue.queue_options[:processed] = :something_crazy
         end
         after(:each) do
-          ProcessQueue.queue_options[:processed] = @old_processed
+          RudeQueue.queue_options[:processed] = @old_processed
         end
         it "should raise an exception" do
-          ProcessQueue.set(:abcde, "some value")
-          lambda {ProcessQueue.get(:abcde)}.should raise_error(ArgumentError)
+          RudeQueue.set(:abcde, "some value")
+          lambda {RudeQueue.get(:abcde)}.should raise_error(ArgumentError)
         end
       end
     end
@@ -203,72 +203,72 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
   
   describe ".backlog" do
     it "should count the unprocessed items for the provided queue_name" do
-      ProcessQueue.delete_all
+      RudeQueue.delete_all
 
-      ProcessQueue.backlog(:abcde).should == 0
-      ProcessQueue.backlog().should == 0
+      RudeQueue.backlog(:abcde).should == 0
+      RudeQueue.backlog().should == 0
 
-      ProcessQueue.set(:abcde, "a value")
-      ProcessQueue.backlog(:abcde).should == 1
-      ProcessQueue.backlog().should == 1
+      RudeQueue.set(:abcde, "a value")
+      RudeQueue.backlog(:abcde).should == 1
+      RudeQueue.backlog().should == 1
 
-      ProcessQueue.set(:something_else, "another value")
-      3.times { ProcessQueue.set(:abcde, :add_three_more)}
+      RudeQueue.set(:something_else, "another value")
+      3.times { RudeQueue.set(:abcde, :add_three_more)}
       
-      ProcessQueue.backlog(:abcde).should == 4
-      ProcessQueue.backlog().should == 5
+      RudeQueue.backlog(:abcde).should == 4
+      RudeQueue.backlog().should == 5
 
-      ProcessQueue.get(:abcde).should == "a value"
-      ProcessQueue.backlog(:abcde).should == 3
-      ProcessQueue.backlog().should == 4
+      RudeQueue.get(:abcde).should == "a value"
+      RudeQueue.backlog(:abcde).should == 3
+      RudeQueue.backlog().should == 4
     end
   end
 
   describe ".cleanup!" do
     it "should use :delete_all" do
-      ProcessQueue.should_receive(:delete_all) # not :destroy_all
-      ProcessQueue.cleanup!
+      RudeQueue.should_receive(:delete_all) # not :destroy_all
+      RudeQueue.cleanup!
     end
     
     it "should allow string inputs" do
-      ProcessQueue.cleanup!("3600")
+      RudeQueue.cleanup!("3600")
     end
     
     it "should allow integer inputs" do
-      ProcessQueue.cleanup!(3600)
+      RudeQueue.cleanup!(3600)
     end
     
     it "should not clear unprocessed items" do
-      ProcessQueue.set('abcde', :giraffe)
-      ProcessQueue.set('abcde', :monkey)
-      ProcessQueue.count.should >= 2
+      RudeQueue.set('abcde', :giraffe)
+      RudeQueue.set('abcde', :monkey)
+      RudeQueue.count.should >= 2
       
-      ProcessQueue.cleanup!
+      RudeQueue.cleanup!
       
-      ProcessQueue.count.should >=2
-      ProcessQueue.get('abcde').should == :giraffe
+      RudeQueue.count.should >=2
+      RudeQueue.get('abcde').should == :giraffe
     end
     
     it "should not clear old unprocessed items" do
-      ProcessQueue.set('abcde', :giraffe)
-      giraffe = ProcessQueue.find(:first, :conditions => {:data => :giraffe})
+      RudeQueue.set('abcde', :giraffe)
+      giraffe = RudeQueue.find(:first, :conditions => {:data => :giraffe})
       
       time_now = Time.now
       Time.stub!(:now).and_return(time_now + 1.year)
       
       giraffe.updated_at.should < 2.weeks.ago
       
-      ProcessQueue.cleanup!
+      RudeQueue.cleanup!
       
       giraffe.reload
-      ProcessQueue.get('abcde').should == :giraffe
+      RudeQueue.get('abcde').should == :giraffe
     end
     
     it "should not clear processed items newer than the argument" do
-      ProcessQueue.set('abcde', :giraffe)
-      ProcessQueue.get('abcde').should == :giraffe
+      RudeQueue.set('abcde', :giraffe)
+      RudeQueue.get('abcde').should == :giraffe
       
-      giraffe = ProcessQueue.find(:first, :conditions => {:data => :giraffe})
+      giraffe = RudeQueue.find(:first, :conditions => {:data => :giraffe})
       
       time_now = Time.now
       Time.stub!(:now).and_return(time_now + 1.week - 5.minutes)
@@ -276,16 +276,16 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       giraffe.updated_at.should > 1.week.ago
       giraffe.processed.should be(true)
       
-      ProcessQueue.cleanup!(1.week)
+      RudeQueue.cleanup!(1.week)
       
       giraffe.reload
     end
     
     it "should not clear processed items newer than one hour, by default" do
-      ProcessQueue.set('abcde', :giraffe)
-      ProcessQueue.get('abcde').should == :giraffe
+      RudeQueue.set('abcde', :giraffe)
+      RudeQueue.get('abcde').should == :giraffe
       
-      giraffe = ProcessQueue.find(:first, :conditions => {:data => :giraffe})
+      giraffe = RudeQueue.find(:first, :conditions => {:data => :giraffe})
       
       time_now = Time.now
       Time.stub!(:now).and_return(time_now + 59.minutes)
@@ -293,16 +293,16 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       giraffe.updated_at.should > 1.hour.ago
       giraffe.processed.should be(true)
       
-      ProcessQueue.cleanup!()
+      RudeQueue.cleanup!()
       
       giraffe.reload
     end
     
     it "should clear processed items older than the argument" do
-      ProcessQueue.set('abcde', :giraffe)
-      ProcessQueue.get('abcde').should == :giraffe
+      RudeQueue.set('abcde', :giraffe)
+      RudeQueue.get('abcde').should == :giraffe
       
-      giraffe = ProcessQueue.find(:first, :conditions => {:data => :giraffe})
+      giraffe = RudeQueue.find(:first, :conditions => {:data => :giraffe})
       
       time_now = Time.now
       Time.stub!(:now).and_return(time_now + 1.week + 5.minutes)
@@ -310,16 +310,16 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       giraffe.updated_at.should < 1.week.ago
       giraffe.processed.should be(true)
       
-      ProcessQueue.cleanup!(1.week)
+      RudeQueue.cleanup!(1.week)
       
       lambda { giraffe.reload }.should raise_error(ActiveRecord::RecordNotFound)
     end
     
     it "should clear processed items older than one hour, by default" do
-      ProcessQueue.set('abcde', :giraffe)
-      ProcessQueue.get('abcde').should == :giraffe
+      RudeQueue.set('abcde', :giraffe)
+      RudeQueue.get('abcde').should == :giraffe
       
-      giraffe = ProcessQueue.find(:first, :conditions => {:data => :giraffe})
+      giraffe = RudeQueue.find(:first, :conditions => {:data => :giraffe})
       
       time_now = Time.now()
       Time.stub!(:now).and_return(time_now + 61.minutes)
@@ -327,7 +327,7 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       giraffe.updated_at.should < 1.hour.ago
       giraffe.processed.should be(true)
       
-      ProcessQueue.cleanup!
+      RudeQueue.cleanup!
       
       lambda { giraffe.reload }.should raise_error(ActiveRecord::RecordNotFound)
     end
@@ -360,13 +360,13 @@ describe RudeQ::TokenLock do
   #   RudeQ::TokenLock.should respond_to(:get_unique_token) # ensure our stub is safe
   #   RudeQ::TokenLock.should_receive(:get_unique_token).exactly(3).times.and_return(@token)
   # 
-  #   @existing = ProcessQueue.create!(:queue_name => 'abcde', :data => :old_data, :token => @token, :processed => true)
+  #   @existing = RudeQueue.create!(:queue_name => 'abcde', :data => :old_data, :token => @token, :processed => true)
   # 
-  #   ProcessQueue.get('abcde').should be(nil)
+  #   RudeQueue.get('abcde').should be(nil)
   #     
-  #   ProcessQueue.set('abcde', :new_data)
-  #   ProcessQueue.get('abcde').should == :new_data
-  #   ProcessQueue.get('abcde').should be(nil)
+  #   RudeQueue.set('abcde', :new_data)
+  #   RudeQueue.get('abcde').should == :new_data
+  #   RudeQueue.get('abcde').should be(nil)
   # end
   
 end

@@ -1,4 +1,4 @@
-class ProcessQueue < ActiveRecord::Base
+class RudeQueue < ActiveRecord::Base
   include RudeQ
   
   class << self

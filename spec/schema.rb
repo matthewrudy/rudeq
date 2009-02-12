@@ -1,5 +1,5 @@
 ActiveRecord::Schema.define(:version => 1) do
-  create_table :process_queues, :force => true do |t|
+  create_table :rude_queues, :force => true do |t|
     t.string :queue_name
     t.text :data
     t.string :token, :default => nil
@@ -7,8 +7,8 @@ ActiveRecord::Schema.define(:version => 1) do
 
     t.timestamps
   end
-  add_index :process_queues, :processed
-  add_index :process_queues, [:queue_name, :processed]
+  add_index :rude_queues, :processed
+  add_index :rude_queues, [:queue_name, :processed]
 
   create_table :somethings, :force => true do |t|
     t.string :name

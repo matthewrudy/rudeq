@@ -55,5 +55,15 @@ module RudeQ
       end
       return @logger
     end
+
+    class << self
+      def queue
+        RudeQ::Scope.new(self.new.queue_name)
+      end
+    end
+
+    def queue
+      self.class.queue
+    end
   end
 end
