@@ -11,7 +11,6 @@ module RudeQ
 
   def self.included(mod) # :nodoc:
     mod.extend(ClassMethods)
-    mod.serialize(:data)
   end
   
   module ClassMethods
@@ -36,7 +35,9 @@ module RudeQ
     #   -> nil
     def set(queue_name, data)
       queue_name = sanitize_queue_name(queue_name)
-      self.create!(:queue_name => queue_name, :data => data)
+
+      yaml_data = YAML.dump(data)
+      self.create!(:queue_name => queue_name, :data => yaml_data)
       return nil # in line with Starling
     end
 
@@ -57,7 +58,7 @@ module RudeQ
       fetch_with_lock(qname) do |record|
         if record
           processed!(record)
-          return record.data
+          return YAML.load(record.data)
         else
           return nil # Starling waits indefinitely for a corresponding queue item
         end

@@ -35,12 +35,12 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       ProcessQueue.set('abcde', 7816327370)
       ProcessQueue.get('abcde').should == 7816327370
     end
-    it "unfortunately doesnt resolve booleans correctly" do
+    it "should resolve booleans correctly" do
       ProcessQueue.set('abcde', true)
-      ProcessQueue.get('abcde').should == 1
+      ProcessQueue.get('abcde').should == true
       
       ProcessQueue.set('abcde', false)
-      ProcessQueue.get('abcde').should == 0
+      ProcessQueue.get('abcde').should == false
     end
     
     it "should :get in the same order they are :set" do
@@ -85,7 +85,7 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
   
   describe ".set" do
     it "should delegate to :create!" do
-      ProcessQueue.should_receive(:create!).with(:queue_name => 'abcde', :data => :magical_planet)
+      ProcessQueue.should_receive(:create!).with(:queue_name => 'abcde', :data => YAML.dump(:magical_planet))
       ProcessQueue.set('abcde', :magical_planet)
     end
     it "should return nil" do
@@ -101,7 +101,7 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       # confirm the object is in the db
       record = ProcessQueue.find(:first, :order => "id DESC")
       record.queue_name.should == 'abcde'
-      record.data.should == :this_will_remain_unprocessed
+      record.data.should == YAML.dump(:this_will_remain_unprocessed)
       record.processed?.should == false
       record.token.should == nil
       
@@ -109,7 +109,7 @@ describe RudeQ::ClassMethods do # ProcessQueue extends ClassMethods
       
       record.reload
       record.queue_name.should == 'abcde'
-      record.data.should == :this_will_remain_unprocessed
+      record.data.should == YAML.dump(:this_will_remain_unprocessed)
       record.processed?.should == false
       record.token.should == nil
     end
