@@ -112,8 +112,8 @@ module RudeQ
     
     def fetch_with_lock(qname, &block) # :nodoc:
       lock = case queue_options[:lock]
-      when :pessimistic : RudeQ::PessimisticLock
-      when :token       : RudeQ::TokenLock
+      when :pessimistic then RudeQ::PessimisticLock
+      when :token       then RudeQ::TokenLock
       else
         raise(ArgumentError, "bad queue_option for :lock - #{queue_options[:lock].inspect}")
       end
