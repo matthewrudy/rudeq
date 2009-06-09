@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "rudeq"
-  s.version = "2.0"
+  s.version = "2.1.0"
   s.date = "2009-06-09"
   s.summary = "ActiveRecord-based DB-queue"
   s.email = "MatthewRudyJacobs@gmail.com"
