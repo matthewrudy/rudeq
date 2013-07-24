@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/spec_helper'
+require 'spec_helper'
+require 'rude_q/worker'
 
 class ExampleWorker < RudeQ::Worker
   def queue_name
@@ -19,7 +20,7 @@ describe RudeQ::Worker do
     @it = ExampleWorker.new
     RudeQueue.delete_all
   end
-  
+
   describe "queue" do
     it "should expose RudeQueue.get scoped for the worker's queue" do
       RudeQueue.set(:some_queue, ["some data for the worker"])

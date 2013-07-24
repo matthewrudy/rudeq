@@ -1,19 +1,10 @@
-require 'rake'
-require 'spec'
-require 'spec/rake/spectask'
-require 'rake/rdoctask'
-
-desc 'Default: run the specs.'
+require 'rspec/core/rake_task'
+RSpec::Core::RakeTask.new(:spec)
 task :default => :spec
 
-desc 'Run specs for rude_q plugin'
-Spec::Rake::SpecTask.new(:spec) do |t|
-  t.spec_opts = ['--options', "\"spec/spec.opts\""]
-  t.spec_files = FileList['spec/**/*_spec.rb']
-end
-
+require 'rdoc/task'
 desc 'Generate documentation for the rude_q plugin.'
-Rake::RDocTask.new(:rdoc) do |rdoc|
+RDoc::Task.new do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'RudeQ'
   rdoc.options << '--line-numbers' << '--inline-source'

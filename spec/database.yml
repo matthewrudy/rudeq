@@ -1,4 +1,8 @@
+# CREATE USER 'rude_q'@'localhost';
+# GRANT ALL PRIVILEGES ON rude_q_test.* to 'rude_q'@'localhost';
+# CREATE DATABASE rude_q_test
+
 rude_q_test:
-  adapter: mysql
+  adapter: mysql2
   username: rude_q
   database: rude_q_test
